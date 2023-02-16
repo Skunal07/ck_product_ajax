@@ -50,9 +50,9 @@ class AdminController extends AppController
     // ================product-category ,Users ,Product table ===================
     public function tables()
     {
-        $users = $this->paginate($this->Users->find('all')->where(['user_type' => 0])->order(['id' => 'DESC']));
-        $categories = $this->paginate($this->ProductCategories->find('all')->contain('Products')->order(['ProductCategories.id' => 'DESC']));
-        $products = $this->paginate($this->Products->find('all')->contain('ProductCategories')->order(['Products.id' => 'DESC']));
+        $users = $this->paginate($this->Users->find('all')->where(['user_type' => 0, 'user_delete' => '1'])->order(['id' => 'DESC']));
+        $categories = $this->paginate($this->ProductCategories->find('all')->contain('Products')->where(['category_delete' => '1'])->order(['ProductCategories.id' => 'DESC']));
+        $products = $this->paginate($this->Products->find('all')->contain('ProductCategories')->where(['product_delete' => '1'])->order(['Products.id' => 'DESC']));
         $this->set(compact('users', 'products', 'categories'));
     }
 
@@ -77,9 +77,9 @@ class AdminController extends AppController
         } elseif ($key != null) {
             $products = $this->Products->find('all')->contain('ProductCategories')->where(['Products.status' => 0, 'Or' => ['product_title like' => '%' . $key . '%', 'product_tags like' => '%' . $key . '%', 'category_name like' => '%' . $key . '%']]);
         } else {
-            $products = $this->Products->find('all')->contain('ProductCategories')->where(['Products.status' => '0'])->order(['Products.id' => 'DESC']);
+            $products = $this->Products->find('all')->contain('ProductCategories')->where(['Products.status' => '0', 'product_delete' => '1'])->order(['Products.id' => 'DESC']);
         }
-        $productc = $this->ProductCategories->find()->where(['status' => '0'])->all();
+        $productc = $this->ProductCategories->find()->where(['status' => '0', 'category_delete' => '1'])->all();
         $countall = array();
         $countall['user'] = $this->Users->find()->count('id');
         $countall['product'] = $this->Products->find()->count('id');
@@ -118,30 +118,37 @@ class AdminController extends AppController
 
 
     // ======================Edit user ==========================================
-    public function edituser($id = null)
+    public function updateuser($id = null)
     {
+        $id = $_REQUEST['id'];
         $user = $this->Users->get($id);
-        $fileName2 = $user['profile_image'];
-        // print_r($user);die;
-        // echo $user['user_profile']['profile_image'];
+        echo json_encode($user);
+        exit;
+    }
+    public function edituser()
+    {
+      
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            // ==========add image ===============
+            $fileName2 = $this->request->getData("userimage");
+            $id = $this->request->getData("idd");
+            $user = $this->Users->get($id, [
+                'contain' => [],
+            ]);
             $productImage = $this->request->getData("profile_image");
             $fileName = $productImage->getClientFilename();
             if ($fileName == '') {
                 $fileName = $fileName2;
             }
+            $fileSize = $productImage->getSize();
             $data["profile_image"] = $fileName;
             $user = $this->Users->patchEntity($user, $data);
             if ($this->Users->save($user)) {
                 $hasFileError = $productImage->getError();
 
                 if ($hasFileError > 0) {
-                    // no file uploaded
                     $data["profile_image"] = "";
                 } else {
-                    // file uploaded
                     $fileType = $productImage->getClientMediaType();
 
                     if ($fileType == "image/png" || $fileType == "image/jpeg" || $fileType == "image/jpg") {
@@ -150,10 +157,17 @@ class AdminController extends AppController
                         $data["profile_image"] = $fileName;
                     }
                 }
-                $this->Flash->success(__('The user has been saved.'));
-                return $this->redirect(['action' => 'tables']);
+                echo json_encode(array(
+                    "status" => 1,
+                    "message" => "The user has been saved.",
+                ));
+                exit;
             }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            echo json_encode(array(
+                "status" => 0,
+                "message" => "The user could not be saved. Please, try again.",
+            ));
+            exit;
         }
         $this->set(compact('user'));
     }
@@ -348,44 +362,60 @@ class AdminController extends AppController
     // ================================deleteproduct=================================
     public function deleteproduct($id = null)
     {
-        $this->request->allowMethod(['get', 'delete']);
+        $id = $_REQUEST['id'];
         $product = $this->Products->get($id);
-        // $this->Products->ProductComments->deleteAll(array('Product_id' => $id));
-        if ($this->Products->delete($product)) {
-            $this->Flash->success(__('The product has been deleted.'));
+        $product->product_delete = 0;
+        if ($this->Products->save($product)) {
+            echo json_encode(array(
+                "status" => 1,
+            ));
+            exit;
         } else {
-            $this->Flash->error(__('The product could not be deleted. Please, try again.'));
+            echo json_encode(array(
+                "status" => 0,
+            ));
+            exit;
         }
-
-        return $this->redirect(['action' => 'tables']);
     }
     // ================================deleteproduct=================================
     public function deleteuser($id = null)
     {
-        $this->request->allowMethod(['get', 'delete']);
+        $id = $_REQUEST['id'];
         $user = $this->Users->get($id);
-        if ($this->Users->delete($user)) {
-            $this->Flash->success(__('The post has been deleted.'));
+        $user->user_delete = 0;
+        if ($this->Users->save($user)) {
+            echo json_encode(array(
+                "status" => 1,
+            ));
+            exit;
         } else {
-            $this->Flash->error(__('The post could not be deleted. Please, try again.'));
+            echo json_encode(array(
+                "status" => 0,
+            ));
+            exit;
         }
-        return $this->redirect(['action' => 'tables']);
     }
     public function deletecategory($id = null)
     {
-        $this->request->allowMethod(['get', 'delete']);
+        $id = $_REQUEST['id'];
         $productc = $this->ProductCategories->get($id);
-        // $this->Products->ProductComments->deleteAll(array('Product_id' => $id));
-        if ($this->ProductCategories->delete($productc)) {
-            $this->Flash->success(__('The product has been deleted.'));
+        $productc->category_delete = 0;
+        if ($this->ProductCategories->save($productc)) {
+            echo json_encode(array(
+                "status" => 1,
+            ));
+            exit;
         } else {
-            $this->Flash->error(__('The product could not be deleted. Please, try again.'));
+            echo json_encode(array(
+                "status" => 0,
+            ));
+            exit;
         }
-
-        return $this->redirect(['action' => 'tables']);
     }
 
     // public $paginate = [
     //     'limit' => 5
     // ];
+
+
 }

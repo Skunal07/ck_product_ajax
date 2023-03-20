@@ -31,7 +31,7 @@ class AdminController extends AppController
         $this->loadComponent('Authentication.Authentication');
         if ($this->Authentication->getIdentity()) {
             $auth = true;
-            $user = $this->Authentication->getIdentity();
+                $user = $this->Authentication->getIdentity();
             if ($user->user_type == 0) {
                 $this->redirect(['controller' => 'Users', 'action' => 'dashboard']);
             } else {
@@ -125,17 +125,18 @@ class AdminController extends AppController
         echo json_encode($user);
         exit;
     }
-    public function edituser()
+    public function editProfile($id = null)
     {
-      
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $fileName2 = $this->request->getData("userimage");
-            $id = $this->request->getData("idd");
+            // print_r($data);
+            // die;
+            $fileName2 = $this->request->getData("imagedd");
+            $id = $this->request->getData("iddd");
             $user = $this->Users->get($id, [
                 'contain' => [],
             ]);
-            $productImage = $this->request->getData("profile_image");
+            $productImage = $this->request->getData('profile_image');
             $fileName = $productImage->getClientFilename();
             if ($fileName == '') {
                 $fileName = $fileName2;
@@ -147,7 +148,7 @@ class AdminController extends AppController
                 $hasFileError = $productImage->getError();
 
                 if ($hasFileError > 0) {
-                    $data["profile_image"] = "";
+                    $data["image"] = "";
                 } else {
                     $fileType = $productImage->getClientMediaType();
 
@@ -159,19 +160,18 @@ class AdminController extends AppController
                 }
                 echo json_encode(array(
                     "status" => 1,
-                    "message" => "The user has been saved.",
+                    "message" => "The User has been saved.",
                 ));
                 exit;
             }
             echo json_encode(array(
                 "status" => 0,
-                "message" => "The user could not be saved. Please, try again.",
+                "message" => "The User  could not be saved. Please, try again.",
             ));
             exit;
         }
         $this->set(compact('user'));
     }
-
 
 
 
@@ -189,6 +189,7 @@ class AdminController extends AppController
         }
 
         if ($this->ProductCategories->save($productcstatus)) {
+            
             echo json_encode(array(
                 "status" => $status,
                 "id" => $id,

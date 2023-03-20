@@ -152,128 +152,47 @@ $(document).ready(function () {
         rules: {
             name: {
                 required: true,
-                minlength: 2,
-                regex: ALPHA_REGEX,
-                noSpace: true,
             },
-            address: {
-                required: true,
             },
-            contact: {
-                required: true,
-                minlength: 10,
-                maxlength: 10,
-                regexno: ALPHA_REGEXn,
-                noSpace: true,
-            },
-            email: {
-                required: true,
-                email: true
-            },
-        },
         messages: {
             name: {
-                required: " Please enter your name",
-                minlength: "Name need to be at least 2 characters long",
-                regex: "Please enter characters only"
+                required: " Please enter your car company name",
             },
-            email: {
-                required: " Please enter your email",
-            },
-            address: {
-                required: " Please enter your address",
-            },
-            
-            contact: {
-                required: "Please enter your phone no",
-                minlength: "phone number must be 10 digits",
-                maxlength: "phone number must be 10 digits",
-                regexno: "please enter digits only"
-            }
+           
         },
         submitHandler: function (form) {
-            // form.submit();
-            return false;
-        }
+            alert("dddd");
+            var formData = new FormData(form);
+            alert("ddddddg");
+            $.ajax({
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                url: "/Admin/editProfile",
+                type: "JSON",
+                method: "POST",
+                cache: false,
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function (response) {
+                    // console.log(response);
+                    // alert(response);
+                    var data = JSON.parse(response);
+                    if (data["status"] == 0) {
+                        alert(data["message"]);
+                    } else {
+                        $("#updateModal").modal("hide");
+                        // $("#ajaxeditUser").modal("hide");
+                        swal("Good job!", "The car has been saved!", "success");
+                    }
+                },
+            });
+        },
     });
 
 
 
-    // $("#rateform").validate({
-    //     rules: {
-    //         review: {
-    //             required: true,
-    //             noSpace: true
-    //         },
-    //     },
-    //     messages: {
-    //         review: {
-    //             required: " Please enter your review",
-    //         },
-    //     },
-    //     submitHandler: function (form) {
-    //         form.submit();
-    //     }
-    // });
-
-
-
-    // $("#carform").validate({
-    //     rules: {
-    //         image: {
-    //             required: true,
-    //         },
-    //         brand: {
-    //             required: true,
-    //         },
-    //         model: {
-    //             required: true,
-    //         },
-    //         make: {
-    //             required: true,
-    //         },
-    //         color: {
-    //             required: true,
-    //         },
-    //         company: {
-    //             required: true,
-    //             minlength: 2,
-    //             noSpace: true
-    //         },
-    //         description: {
-    //             required: true,
-    //             minlength: 10,
-    //         },
-    //     },
-    //     messages: {
-    //         image: {
-    //             required: " Please select your car image",
-    //         },
-    //         brand: {
-    //             required: " Please select your car brand",
-    //         },
-    //         model: {
-    //             required: " Please select your car model",
-    //         },
-    //         make: {
-    //             required: " Please select your car make year",
-    //         },
-    //         color: {
-    //             required: " Please select your car color",
-    //         },
-    //         company: {
-    //             required: " Please enter your car company name",
-    //             minlength: "Company name need to be at least 2 characters long",
-    //         },
-    //         description: {
-    //             required: "Please enter your car description",
-    //             minlength: "Description need to be at least 10 characters long",
-    //         },
-    //     },
-    //     submitHandler: function (form) {
-    //         form.submit();
-    //     }
-    // });
     $('body').on('click', '.deleteUser', function () {
 
         var id = $(this).next('input').val();
@@ -397,12 +316,12 @@ $(document).ready(function () {
                 var json = $.parseJSON(response);
                 $('#updateModal').modal('show');
                 $.each(json, function () {
-                    $("#id").val(json['id']);
+                    $("#iddd").val(json['id']);
                     $("#name").val(json['name']);
                     $("#email").val(json['email']);
                     $("#address").val(json['address']);
                     $("#contact").val(json['contact']);
-                    $("#userimage").val(json['profile_image']);
+                    $("#imagedd").val(json['profile_image']);
                     $("#profile-image").val(json['profile_image']);
                     var image = json['profile_image'];
                     // console.log(image,'dsdsd');

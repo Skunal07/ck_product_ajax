@@ -1,4 +1,8 @@
 <body class="g-sidenav-show  bg-gray-200">
+    <?php echo $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>
+    <script>
+        var csrfToken = $('meta[name="csrfToken"]').attr('content');
+    </script>
     <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
         <div class="sidenav-header">
             <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
@@ -240,66 +244,30 @@
                             <h5 class="modal-title" id="exampleModalLabel">update details</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
+                        <?= $this->Form->create(null, ['id' => 'useredit', 'type' => 'file']) ?>
                         <div class="modal-body">
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label>Image</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="file" class="form-control" id="profile_image">
-                                        <img src="" alt="" id="profile-image" width="100px">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label class="form-label"> Name</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="name" placeholder="Enter your firstname">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label>Email</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="email" placeholder="Enter your email">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label>Address</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="address" placeholder="Enter your address">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label>phone number</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="contact" placeholder="Enter your phone number">
-                                    </div>
-                                </div>
-                            </div>
-                            <input type="hidden" name="id" id="id" />
+                            <!--============= hidden image and id if image is not updated ============ -->
+                            <input type="hidden" id="imagedd" name="imagedd">
+                            <input type="hidden" id="iddd" name="iddd">
+                            <!--============= hidden image and id if image is not updated ============ -->
 
+                            <img src="" alt="" id='profile-image' width="100px">
+                            <?php
+                            // echo $this->Form->control('user_id', ['options' => $users]);
+                            echo $this->Form->control('profile_image', ['type' => 'file']);
+                            echo $this->Form->control('name');
+                            echo $this->Form->control('contact');
+                            echo $this->Form->control('address');
+                            echo $this->Form->control('email');
+                            // echo $this->Form->control('password');
+                            ?>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-dark updatedata" onclick="updatedata()">update</button>
+                            <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">close</button>
                             <input type="hidden" id="hiddendata">
                         </div>
+                        <?= $this->Form->end() ?>
                     </div>
                 </div>
             </div>
